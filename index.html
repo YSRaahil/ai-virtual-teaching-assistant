@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BODH AI - Your AI Teaching Assistant</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.19.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #6b4226;
+            /* Earthy brown */
+            --secondary-color: #556B2F;
+            /* Earthy green */
+            --accent-color: #8c5a3e;
+            /* Warm terracotta */
+            --text-color: #4b3f34;
+            /* Deep brown for text */
+            --light-bg: #f4f1ea;
+            /* Soft beige background */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+        }
+
+        .navbar {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color)) !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, rgba(107, 66, 38, 0.1) 0%, rgba(143, 148, 251, 0.1) 100%);
+            padding: 6rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-text {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.5;
+            z-index: 1;
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            border: none;
+            box-shadow: 0 4px 15px rgba(78, 84, 200, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(78, 84, 200, 0.6);
+        }
+
+        .feature-card {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            font-size: 2rem;
+        }
+
+        .text-gradient {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .testimonial-section {
+            background-color: var(--light-bg);
+        }
+
+        .testimonial-card {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .footer {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .social-icon:hover {
+            background-color: #6b8e23;
+            /* Darker earthy green */
+            transform: translateY(-3px);
+        }
+
+        /* Animation classes */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .fade-in.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .stagger-item {
+            transition-delay: calc(var(--i) * 0.1s);
+        }
+
+        .btn-outline-primary {
+            color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+    <img width=55px height=55px src="C:\Users\mulap\Downloads\web logo (1).png">
+
+            <a class="navbar-brand fw-bold" href="{{ url_for('home') }}">
+                BODH AI
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+   <li class="nav-item">
+                        <a class="nav-link active" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#testimonials">Testimonials</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#pricing">Pricing</a>
+                    </li>
+		    <li class="nav-item"><a class="nav-link" href="chatbot.html">Chatbot</a></li>
+                    <li class="nav-item"><a class="nav-link" href="spm.html">Student Management</a></li>
+                    <li class="nav-item"><a class="nav-link" href="instructor_profile.html">Instructor Profile</a></li>
+
+                </ul>
+               <div class="d-flex">
+                    <a href="login.html" class="btn btn-outline-light me-2">Login</a>
+                    <a href="signup.html" class="btn btn-light">Sign Up</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section with Animated Headline -->
+    <header class="hero-section">
+        <div class="container hero-text">
+            <h1 class="display-4 fw-bold mb-3 animate__animated animate__fadeInUp">
+                <span class="text-gradient">Transform Your Teaching</span> Experience
+            </h1>
+            <p class="lead mb-4 animate__animated animate__fadeInUp animate__delay-1s">
+                BODH AI is your personal teaching assistant powered by artificial intelligence.
+                Save time, engage students, and enhance learning outcomes.
+            </p>
+            <div class="animate__animated animate__fadeInUp animate__delay-2s">
+                <a href="login.html" class="btn btn-primary btn-lg px-4 me-2">Get Started Free</a>
+                <a href="#features" class="btn btn-outline-primary btn-lg px-4">Learn More</a>
+            </div>
+        </div>
+    </header>
+    <!-- Features Section with Animated Cards -->
+    <section id="features" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5 fade-in">Powerful <span class="text-gradient">AI-Powered</span> Features</h2>
+
+            <div class="row g-4">
+                <!-- Feature 1 -->
+                <div class="col-md-4 fade-in" style="--i: 1">
+                    <div class="feature-card p-4 text-center">
+                        <div class="feature-icon mb-4">
+                            <i class="bi bi-lightning"></i>
+                        </div>
+                        <h3>Smart Lesson Planning</h3>
+                        <p class="text-muted">Generate engaging lesson plans in seconds based on your curriculum and teaching style.</p>
+                    </div>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="col-md-4 fade-in" style="--i: 2">
+                    <div class="feature-card p-4 text-center">
+                        <div class="feature-icon mb-4">
+                            <i class="bi bi-bar-chart"></i>
+                        </div>
+                        <h3>Student Progress Tracking</h3>
+                        <p class="text-muted">Monitor individual student progress with AI-powered insights and personalized recommendations.</p>
+                    </div>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="col-md-4 fade-in" style="--i: 3">
+                    <div class="feature-card p-4 text-center">
+                        <div class="feature-icon mb-4">
+                            <i class="bi bi-file-text"></i>
+                        </div>
+                        <h3>Automated Grading</h3>
+                        <p class="text-muted">Save hours with AI-assisted grading that provides detailed feedback for students.</p>
+                    </div>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="col-md-4 fade-in" style="--i: 4">
+                    <div class="feature-card p-4 text-center">
+                        <div class="feature-icon mb-4">
+                            <i class="bi bi-chat-dots"></i>
+                        </div>
+                        <h3>AI Tutoring Support</h3>
+                        <p class="text-muted">Offer personalized tutoring assistance to students 24/7 with our AI companion.</p>
+                    </div>
+                </div>
+
+                <!-- Feature 5 -->
+                <div class="col-md-4 fade-in" style="--i: 5">
+                    <div class="feature-card p-4 text-center">
+                        <div class="feature-icon mb-4">
+                            <i class="bi bi-translate"></i>
+                        </div>
+                        <h3>Multilingual Support</h3>
+                        <p class="text-muted">Break language barriers with real-time translation in over 50 languages.</p>
+                    </div>
+                </div>
+
+                <!-- Feature 6 -->
+                <div class="col-md-4 fade-in" style="--i: 6">
+                    <div class="feature-card p-4 text-center">
+                        <div class="feature-icon mb-4">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <h3>Privacy Focused</h3>
+                        <p class="text-muted">FERPA-compliant platform with enterprise-grade security to protect student data.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="testimonial-section py-5">
+        <div class="container">
+            <h2 class="text-center mb-5 fade-in">What Educators Are <span class="text-gradient">Saying</span></h2>
+
+            <div class="row g-4">
+                <!-- Testimonial 1 -->
+                <div class="col-md-4 fade-in" style="--i: 1">
+                    <div class="testimonial-card p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <img src="/api/placeholder/60/60" alt="Saraswathi K" class="avatar me-3">
+                            <div>
+                                <h5 class="mb-0">Saraswathi K</h5>
+                                <p class="text-muted mb-0">High School Science Teacher</p>
+                            </div>
+                        </div>
+                        <p>"BODH AI has revolutionized my classroom. I've saved at least 10 hours a week on grading and lesson planning."</p>
+                    </div>
+                </div>
+
+                <!-- Testimonial 2 -->
+                <div class="col-md-4 fade-in" style="--i: 2">
+                    <div class="testimonial-card p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <img src="/api/placeholder/60/60" alt="Mohan Rao I" class="avatar me-3">
+                            <div>
+                                <h5 class="mb-0">Mohan Rao I</h5>
+                                <p class="text-muted mb-0">Elementary School Principal</p>
+                            </div>
+                        </div>
+                        <p>"Our entire school has seen improved student outcomes since implementing BODH AI. It's an essential tool for modern education."</p>
+                    </div>
+                </div>
+
+                <!-- Testimonial 3 -->
+                <div class="col-md-4 fade-in" style="--i: 3">
+                    <div class="testimonial-card p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <img src="/api/placeholder/60/60" alt="Emma Z" class="avatar me-3">
+                            <div>
+                                <h5 class="mb-0">Emma Z</h5>
+                                <p class="text-muted mb-0">University Professor</p>
+                            </div>
+                        </div>
+                        <p>"The personalized feedback my students receive has significantly increased engagement. I can focus more on teaching and less on
+                            administrative tasks."</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5 fade-in">Simple, <span class="text-gradient">Transparent</span> Pricing</h2>
+
+            <div class="row g-4 justify-content-center">
+                <!-- Free Plan -->
+                <div class="col-md-4 fade-in" style="--i: 1">
+                    <div class="feature-card p-4 text-center">
+                        <h3 class="mb-4">Starter</h3>
+                        <h2 class="display-4 fw-bold mb-3">Free</h2>
+                        <p class="text-muted mb-4">Perfect for individual teachers</p>
+                        <ul class="list-unstyled text-start mb-4">
+                            <li class="mb-2">✓ Basic lesson planning</li>
+                            <li class="mb-2">✓ Limited grading assistance</li>
+                            <li class="mb-2">✓ 50 AI queries per month</li>
+                            <li class="mb-2 text-muted">✗ Student progress tracking</li>
+                            <li class="mb-2 text-muted">✗ Advanced analytics</li>
+                        </ul>
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-outline-primary w-100">Get Started</a>
+                    </div>
+                </div>
+
+                <!-- Pro Plan -->
+                <div class="col-md-4 fade-in" style="--i: 2">
+                    <div class="feature-card p-4 text-center" style="border-top: 5px solid var(--primary-color);">
+                        <div class="badge bg-primary mb-2">Most Popular</div>
+                        <h3 class="mb-4">Professional</h3>
+                        <h2 class="display-4 fw-bold mb-3">₹999<small class="fs-6">/month</small></h2>
+                        <p class="text-muted mb-4">For dedicated educators</p>
+                        <ul class="list-unstyled text-start mb-4">
+                            <li class="mb-2">✓ Advanced lesson planning</li>
+                            <li class="mb-2">✓ Full grading assistance</li>
+                            <li class="mb-2">✓ Unlimited AI queries</li>
+                            <li class="mb-2">✓ Student progress tracking</li>
+                            <li class="mb-2 text-muted">✗ Advanced analytics</li>
+                        </ul>
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-primary w-100">Upgrade Now</a>
+                    </div>
+                </div>
+
+                <!-- School Plan -->
+                <div class="col-md-4 fade-in" style="--i: 3">
+                    <div class="feature-card p-4 text-center" style="border-top: 5px solid var(--primary-color);">
+                        <h3 class="mb-4">School</h3>
+                        <h2 class="display-4 fw-bold mb-3">₹699<small class="fs-6">/month</small></h2>
+                        <p class="text-muted mb-4">For institutions and schools</p>
+                        <ul class="list-unstyled text-start mb-4">
+                            <li class="mb-2">✓ All Professional features</li>
+                            <li class="mb-2">✓ Priority support</li>
+                            <li class="mb-2">✓ Custom integrations</li>
+                            <li class="mb-2">✓ Dedicated account manager</li>
+                            <li class="mb-2">✓ Advanced analytics</li>
+                        </ul>
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-primary w-100">Contact Sales</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer class="footer py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>BODH AI</h4>
+                    <p>Empowering educators with AI-driven tools.</p>
+                    <a href="#" class="social-icon me-2"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="social-icon me-2"><i class="bi bi-twitter"></i></a>
+                    <a href="#" class="social-icon me-2"><i class="bi bi-linkedin"></i></a>
+                    <a href="#" class="social-icon me-2"><i class="bi bi-instagram"></i></a>
+                </div>
+                <div class="col-md-3">
+                    <h4>Quick Links</h4>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white">Features</a></li>
+                        <li><a href="#" class="text-white">Pricing</a></li>
+                        <li><a href="#" class="text-white">Testimonials</a></li>
+                        <li><a href="#" class="text-white">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h4>Subscribe</h4>
+                    <p>Stay updated with our latest offers.</p>
+                    <form>
+                        <div class="input-group">
+                            <input type="email" class="form-control" placeholder="Your Email">
+                            <button class="btn btn-light" type="submit">Subscribe</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <hr style="border-color: rgba(255, 255, 255, 0.2);">
+            <p class="text-center">
+                &copy; 2025 BODH AI. All rights reserved.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap and Custom Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const fadeInElements = document.querySelectorAll('.fade-in');
+
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            });
+
+            fadeInElements.forEach(element => {
+                observer.observe(element);
+            });
+        });
+    </script>
+</body>
+
+</html>

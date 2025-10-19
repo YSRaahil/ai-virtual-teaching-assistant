@@ -1,0 +1,54 @@
+from flask import Flask, request, jsonify
+import openai  # or use any AI model
+import spacy
+import networkx as nx
+import matplotlib.pyplot as plt
+import os
+
+app = Flask(__name__)
+openai.api_key = "AIzaSyBYRmHbAH5r-Hw3bEBX0--i1lqc4PBvAGA"  # Replace with actual key
+
+nlp = spacy.load("en_core_web_sm")
+
+def generate_mindmap(text):
+    doc = nlp(text)
+    concepts = set()
+    edges = []
+    
+    for ent in doc.ents:
+        concepts.add(ent.text)
+    
+    for chunk in doc.noun_chunks:
+        concepts.add(chunk.text)
+        edges.append((chunk.root.head.text, chunk.text))
+    
+    G = nx.Graph()
+    G.add_edges_from(edges)
+    
+    plt.figure(figsize=(8, 6))
+    nx.draw(G, with_labels=True, node_color='lightblue', edge_color='gray', node_size=2000, font_size=10)
+    plt.savefig("static/mindmap.png")
+    return "static/mindmap.png"
+
+@app.route("/chat", methods=["POST"])
+def chatbot():
+    data = request.json
+    message = data.get("message", "")
+    
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",  
+        messages=[{"role": "user", "content": message}]
+    )
+    
+    return jsonify({"status": "success", "response": response['choices'][0]['message']['content']})
+
+@app.route("/analyze", methods=["POST"])
+def analyze_learning():
+    data = request.json
+    content = data.get("content", "")
+    
+    mindmap_path = generate_mindmap(content)
+    return jsonify({"status": "success", "mindmap": mindmap_path})
+
+if __name__ == "__main__":
+    app.run(debug=True)
