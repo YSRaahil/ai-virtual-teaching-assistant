@@ -7,7 +7,7 @@
 ![Prize](https://img.shields.io/badge/Prize-%E2%82%B926,000-success?style=for-the-badge)
 
 --- 
-
+ 
 ### 🚀 Overview
 **AI Teaching Assistant** is a SaaS-based project that integrates Artificial Intelligence into teaching and learning workflows.  
 It empowers educators to create content, guide students, and analyze performance — while students benefit from personalized, AI-driven feedback and support.
