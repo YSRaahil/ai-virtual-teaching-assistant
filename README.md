@@ -6,7 +6,7 @@
 ![Domain](https://img.shields.io/badge/Domain-SaaS%20%2F%20EdTech-orange?style=for-the-badge)
 ![Prize](https://img.shields.io/badge/Prize-%E2%82%B926,000-success?style=for-the-badge)
 
----
+--- 
 
 ### 🚀 Overview
 **AI Teaching Assistant** is a SaaS-based project that integrates Artificial Intelligence into teaching and learning workflows.  
