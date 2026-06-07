@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BODH AI — Student Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0a0d14; --surface: #111520; --surface2: #161c2e;
+      --border: #1e2740; --accent: #4f7cff; --accent2: #7c3aed;
+      --text: #e8eaf0; --muted: #6b7280; --success: #10b981; --error: #ef4444;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      padding: 16px 32px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      background: rgba(10,13,20,0.92); backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+    .logo { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800;
+      background: linear-gradient(135deg, #4f7cff, #7c3aed);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .nav-right { display: flex; align-items: center; gap: 16px; }
+    .user-tag { font-size: 13px; color: var(--muted); }
+    .btn-sm { padding: 7px 16px; border: 1px solid var(--border); border-radius: 8px;
+      background: none; color: var(--text); font-size: 13px; cursor: pointer; }
+    .btn-sm:hover { border-color: var(--accent); color: var(--accent); }
+
+    .layout { display: flex; padding-top: 64px; min-height: 100vh; }
+
+    sidebar {
+      width: 220px; min-height: calc(100vh - 64px);
+      border-right: 1px solid var(--border);
+      padding: 24px 16px;
+      position: fixed; top: 64px; left: 0; bottom: 0;
+      overflow-y: auto;
+      background: var(--surface);
+    }
+
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 10px;
+      color: var(--muted); font-size: 14px;
+      cursor: pointer; transition: all 0.15s;
+      margin-bottom: 4px;
+      border: none; background: none; width: 100%; text-align: left;
+    }
+    .nav-item:hover { color: var(--text); background: var(--surface2); }
+    .nav-item.active { color: var(--accent); background: rgba(79,124,255,0.08); }
+
+    main { margin-left: 220px; padding: 32px; flex: 1; }
+
+    h2 { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 700; margin-bottom: 8px; }
+    .page-sub { color: var(--muted); font-size: 14px; margin-bottom: 28px; }
+
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* Stats row */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 20px;
+    }
+    .stat-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .stat-val { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 700; }
+    .stat-val.blue { color: var(--accent); }
+    .stat-val.green { color: var(--success); }
+    .stat-val.purple { color: var(--accent2); }
+
+    /* Cards */
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 20px;
+      transition: border-color 0.15s;
+    }
+    .card:hover { border-color: rgba(79,124,255,0.4); }
+    .card-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+    .card-meta { font-size: 13px; color: var(--muted); margin-bottom: 16px; line-height: 1.5; }
+    .badge {
+      display: inline-block; padding: 3px 10px; border-radius: 100px;
+      font-size: 11px; font-weight: 500;
+    }
+    .badge-blue { background: rgba(79,124,255,0.12); color: #4f7cff; }
+    .badge-green { background: rgba(16,185,129,0.12); color: #10b981; }
+    .badge-red { background: rgba(239,68,68,0.12); color: #ef4444; }
+
+    /* Score bar */
+    .score-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin: 8px 0; }
+    .score-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #4f7cff, #7c3aed); transition: width 0.6s ease; }
+
+    /* Buttons */
+    .btn { padding: 9px 18px; border-radius: 9px; border: none; font-family: 'DM Sans', sans-serif;
+      font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-primary:hover { background: #3d6bff; }
+    .btn-outline { background: none; border: 1px solid var(--border); color: var(--text); }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* Assignment submit */
+    .submit-area textarea {
+      width: 100%; min-height: 160px; padding: 14px;
+      background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
+      color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px;
+      resize: vertical; outline: none; line-height: 1.6;
+    }
+    .submit-area textarea:focus { border-color: var(--accent); }
+
+    /* Feedback box */
+    .feedback-box {
+      background: rgba(16,185,129,0.06);
+      border: 1px solid rgba(16,185,129,0.2);
+      border-radius: 12px; padding: 20px; margin-top: 16px;
+    }
+    .feedback-score { font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; color: var(--success); }
+    .feedback-text { font-size: 14px; color: var(--muted); margin-top: 8px; line-height: 1.6; }
+    .keyword-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .kw { padding: 4px 10px; border-radius: 100px; font-size: 12px; }
+    .kw-found { background: rgba(16,185,129,0.1); color: #10b981; }
+    .kw-missing { background: rgba(239,68,68,0.1); color: #ef4444; }
+
+    /* Chat */
+    .chat-container { display: flex; flex-direction: column; height: calc(100vh - 200px); }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 16px; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 14px; margin-bottom: 16px; }
+    .msg { margin-bottom: 16px; max-width: 75%; }
+    .msg.user { margin-left: auto; }
+    .msg-bubble { padding: 12px 16px; border-radius: 14px; font-size: 14px; line-height: 1.6; }
+    .msg.ai .msg-bubble { background: var(--surface2); color: var(--text); }
+    .msg.user .msg-bubble { background: var(--accent); color: white; }
+    .msg-name { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+    .msg.user .msg-name { text-align: right; }
+    .chat-input-row { display: flex; gap: 10px; }
+    .chat-input { flex: 1; padding: 12px 16px; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 10px;
+      color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; }
+    .chat-input:focus { border-color: var(--accent); }
+
+    .section-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+    .empty { text-align: center; color: var(--muted); padding: 40px; font-size: 14px; }
+    .alert { padding: 12px 14px; border-radius: 10px; font-size: 13px; margin-bottom: 16px; }
+    .alert.error { background: rgba(239,68,68,0.1); color: #fca5a5; }
+    .alert.success { background: rgba(16,185,129,0.1); color: #6ee7b7; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">BODH AI</div>
+  <div class="nav-right">
+    <span class="user-tag" id="userTag">Student</span>
+    <button class="btn-sm" onclick="logout()">Sign out</button>
+  </div>
+</nav>
+
+<div class="layout">
+  <sidebar>
+    <button class="nav-item active" onclick="showPage('home')">🏠 Dashboard</button>
+    <button class="nav-item" onclick="showPage('courses')">📚 My Courses</button>
+    <button class="nav-item" onclick="showPage('assignments')">📝 Assignments</button>
+    <button class="nav-item" onclick="showPage('performance')">📊 My Progress</button>
+    <button class="nav-item" onclick="showPage('chat')">🤖 AI Chat</button>
+  </sidebar>
+
+  <main>
+    <!-- HOME -->
+    <div class="page active" id="page-home">
+      <h2 id="welcomeMsg">Welcome back!</h2>
+      <p class="page-sub">Here's your learning overview</p>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Courses Enrolled</div>
+          <div class="stat-val blue" id="statCourses">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Assignments</div>
+          <div class="stat-val" id="statAssignments">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Avg Score</div>
+          <div class="stat-val green" id="statAvg">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Trend</div>
+          <div class="stat-val purple" id="statTrend">—</div>
+        </div>
+      </div>
+
+      <div class="section-title">Enrolled Courses</div>
+      <div class="card-grid" id="homeCourseList"><div class="empty">Loading...</div></div>
+    </div>
+
+    <!-- COURSES -->
+    <div class="page" id="page-courses">
+      <h2>Browse Courses</h2>
+      <p class="page-sub">Enroll in available courses</p>
+      <div class="card-grid" id="allCourseList"><div class="empty">Loading...</div></div>
+    </div>
+
+    <!-- ASSIGNMENTS -->
+    <div class="page" id="page-assignments">
+      <h2>Assignments</h2>
+      <p class="page-sub">Submit your work and get instant AI feedback</p>
+      <div id="assignmentList"><div class="empty">Select a course first from My Courses</div></div>
+    </div>
+
+    <!-- PERFORMANCE -->
+    <div class="page" id="page-performance">
+      <h2>My Progress</h2>
+      <p class="page-sub">Track your grades and identify weak areas</p>
+      <div id="performanceContent"><div class="empty">Loading...</div></div>
+    </div>
+
+    <!-- CHAT -->
+    <div class="page" id="page-chat">
+      <h2>AI Teaching Assistant</h2>
+      <p class="page-sub">Ask anything about your courses</p>
+      <div class="chat-container">
+        <div class="chat-messages" id="chatMessages">
+          <div class="msg ai">
+            <div class="msg-name">BODH AI</div>
+            <div class="msg-bubble">Hi! I'm your AI teaching assistant. Ask me anything about your courses, concepts, or assignments. 👋</div>
+          </div>
+        </div>
+        <div class="chat-input-row">
+          <input class="chat-input" id="chatInput" placeholder="Ask a question..." onkeydown="if(event.key==='Enter') sendChat()"/>
+          <button class="btn btn-primary" onclick="sendChat()">Send</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const API = window.location.origin;
+const token = localStorage.getItem('token');
+const user = JSON.parse(localStorage.getItem('user') || 'null');
+
+if (!token || !user || user.role !== 'student') {
+  window.location.href = '/';
+}
+
+document.getElementById('userTag').textContent = user?.name || 'Student';
+document.getElementById('welcomeMsg').textContent = `Welcome back, ${user?.name?.split(' ')[0]}!`;
+
+async function api(path, options = {}) {
+  const res = await fetch(`${API}${path}`, {
+    ...options,
+    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', ...options.headers }
+  });
+  return res.json();
+}
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`page-${name}`).classList.add('active');
+  event?.target?.classList.add('active');
+  if (name === 'courses') loadAllCourses();
+  if (name === 'performance') loadPerformance();
+}
+
+function logout() {
+  localStorage.clear();
+  window.location.href = '/';
+}
+
+// ── DASHBOARD ──
+async function loadDashboard() {
+  const res = await api('/api/courses');
+  const courses = res.data || [];
+  document.getElementById('statCourses').textContent = courses.length;
+
+  const list = document.getElementById('homeCourseList');
+  if (!courses.length) { list.innerHTML = '<div class="empty">No courses yet. Browse and enroll!</div>'; return; }
+
+  list.innerHTML = courses.map(c => `
+    <div class="card" onclick="loadCourseAssignments(${c.id}, '${c.title}')">
+      <div class="card-title">${c.title}</div>
+      <div class="card-meta">${c.description || 'No description'}<br/>By ${c.teacher_name || 'Instructor'}</div>
+      <span class="badge badge-blue">Enrolled</span>
+    </div>
+  `).join('');
+
+  // Load performance stats
+  const perf = await api(`/api/students/${user.id}/performance`);
+  const summary = perf.data?.summary;
+  if (summary) {
+    document.getElementById('statAssignments').textContent = summary.total_assignments;
+    document.getElementById('statAvg').textContent = summary.average_score + '%';
+    document.getElementById('statTrend').textContent =
+      summary.trend === 'improving' ? '📈' : summary.trend === 'declining' ? '📉' : '➡️';
+  }
+}
+
+// ── ALL COURSES ──
+async function loadAllCourses() {
+  const res = await api('/api/courses');
+  const enrolled = (res.data || []).map(c => c.id);
+  const allRes = await fetch(`${API}/api/courses`, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+  const all = (await allRes.json()).data || [];
+  const list = document.getElementById('allCourseList');
+  list.innerHTML = all.map(c => `
+    <div class="card">
+      <div class="card-title">${c.title}</div>
+      <div class="card-meta">${c.description || ''}<br/>By ${c.teacher_name || 'Instructor'}</div>
+      ${enrolled.includes(c.id)
+        ? `<span class="badge badge-green">✓ Enrolled</span>`
+        : `<button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="enroll(${c.id}, this)">Enroll</button>`
+      }
+    </div>
+  `).join('') || '<div class="empty">No courses available</div>';
+}
+
+async function enroll(courseId, btn) {
+  btn.disabled = true; btn.textContent = 'Enrolling...';
+  const res = await api(`/api/courses/${courseId}/enroll`, { method: 'POST' });
+  if (res.status === 'success') {
+    btn.textContent = '✓ Enrolled'; btn.style.background = 'var(--success)';
+    loadDashboard();
+  } else {
+    btn.disabled = false; btn.textContent = 'Enroll';
+    alert(res.message);
+  }
+}
+
+// ── ASSIGNMENTS ──
+async function loadCourseAssignments(courseId, courseTitle) {
+  showPage('assignments');
+  document.querySelector('[onclick="showPage(\'assignments\')"]')?.classList.add('active');
+  const res = await api(`/api/courses/${courseId}`);
+  const assignments = res.data?.assignments || [];
+  const list = document.getElementById('assignmentList');
+
+  if (!assignments.length) {
+    list.innerHTML = '<div class="empty">No assignments yet in this course.</div>';
+    return;
+  }
+
+  list.innerHTML = `<div class="section-title">${courseTitle}</div>` +
+    assignments.map(a => `
+      <div class="card" style="margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:12px">
+          <div class="card-title">${a.title}</div>
+          ${a.due_date ? `<span style="font-size:12px;color:var(--muted)">Due: ${a.due_date}</span>` : ''}
+        </div>
+        <div class="card-meta">${a.description || ''}</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Max score: ${a.max_score}</div>
+        <div class="submit-area" id="submit-${a.id}">
+          <textarea id="answer-${a.id}" placeholder="Write your answer here..."></textarea>
+          <button class="btn btn-primary" style="margin-top:10px" onclick="submitAssignment(${a.id}, ${a.max_score}, this)">
+            Submit Answer
+          </button>
+        </div>
+        <div id="result-${a.id}"></div>
+      </div>
+    `).join('');
+}
+
+async function submitAssignment(assignmentId, maxScore, btn) {
+  const content = document.getElementById(`answer-${assignmentId}`).value.trim();
+  if (!content) return alert('Please write an answer first.');
+  btn.disabled = true; btn.textContent = 'Grading...';
+
+  const res = await api(`/api/assignments/${assignmentId}/submit`, {
+    method: 'POST', body: JSON.stringify({ content })
+  });
+
+  btn.disabled = false; btn.textContent = 'Submit Answer';
+
+  const resultDiv = document.getElementById(`result-${assignmentId}`);
+  if (res.status === 'success') {
+    const d = res.data;
+    const pct = Math.round((d.score / maxScore) * 100);
+    resultDiv.innerHTML = `
+      <div class="feedback-box">
+        <div style="display:flex;align-items:baseline;gap:8px">
+          <div class="feedback-score">${d.score}</div>
+          <div style="color:var(--muted);font-size:14px">/ ${maxScore} &nbsp;(${pct}%)</div>
+        </div>
+        <div class="score-bar"><div class="score-fill" style="width:${pct}%"></div></div>
+        <div class="feedback-text">${d.feedback}</div>
+        ${d.found_keywords?.length ? `
+          <div style="margin-top:12px;font-size:12px;color:var(--muted)">Keywords covered:</div>
+          <div class="keyword-list">${d.found_keywords.map(k => `<span class="kw kw-found">✓ ${k}</span>`).join('')}</div>
+        ` : ''}
+        ${d.missing_keywords?.length ? `
+          <div style="margin-top:8px;font-size:12px;color:var(--muted)">Missing topics:</div>
+          <div class="keyword-list">${d.missing_keywords.map(k => `<span class="kw kw-missing">✗ ${k}</span>`).join('')}</div>
+        ` : ''}
+      </div>`;
+    loadDashboard();
+  } else {
+    resultDiv.innerHTML = `<div class="alert error">${res.message}</div>`;
+  }
+}
+
+// ── PERFORMANCE ──
+async function loadPerformance() {
+  const res = await api(`/api/students/${user.id}/performance`);
+  const { grades, summary, weak_topics } = res.data || {};
+  const div = document.getElementById('performanceContent');
+
+  if (!grades?.length) {
+    div.innerHTML = '<div class="empty">No grades yet. Submit some assignments!</div>';
+    return;
+  }
+
+  div.innerHTML = `
+    <div class="stats-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:24px">
+      <div class="stat-card"><div class="stat-label">Average Score</div><div class="stat-val blue">${summary.average_score}%</div></div>
+      <div class="stat-card"><div class="stat-label">Assignments Completed</div><div class="stat-val">${summary.total_assignments}</div></div>
+      <div class="stat-card"><div class="stat-label">Trend</div><div class="stat-val purple">${summary.trend}</div></div>
+    </div>
+    ${weak_topics?.length ? `
+      <div class="card" style="margin-bottom:24px">
+        <div class="card-title" style="margin-bottom:12px">⚠️ Topics to Review</div>
+        <div class="keyword-list">${weak_topics.map(t => `<span class="kw kw-missing">${t}</span>`).join('')}</div>
+      </div>` : ''}
+    <div class="section-title">Grade History</div>
+    ${grades.map(g => {
+      const pct = Math.round((g.score / g.max_score) * 100);
+      return `
+        <div class="card" style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div class="card-title">${g.assignment_title}</div>
+              <div style="font-size:13px;color:var(--muted)">${g.course_title}</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:${pct >= 75 ? 'var(--success)' : pct >= 50 ? 'var(--accent)' : 'var(--error)'}">${g.score}/${g.max_score}</div>
+              <div style="font-size:12px;color:var(--muted)">${pct}%</div>
+            </div>
+          </div>
+          <div class="score-bar" style="margin-top:10px"><div class="score-fill" style="width:${pct}%"></div></div>
+        </div>`;
+    }).join('')}
+  `;
+}
+
+// ── AI CHAT ──
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+
+  const messages = document.getElementById('chatMessages');
+  messages.innerHTML += `<div class="msg user"><div class="msg-name">You</div><div class="msg-bubble">${msg}</div></div>`;
+  messages.innerHTML += `<div class="msg ai" id="typing"><div class="msg-name">BODH AI</div><div class="msg-bubble">Thinking...</div></div>`;
+  messages.scrollTop = messages.scrollHeight;
+
+  const res = await api('/api/ai/chat', { method: 'POST', body: JSON.stringify({ message: msg }) });
+
+  document.getElementById('typing').remove();
+  const reply = res.status === 'success' ? res.data.response : (res.message || 'Sorry, something went wrong.');
+  messages.innerHTML += `<div class="msg ai"><div class="msg-name">BODH AI</div><div class="msg-bubble">${reply.replace(/\n/g, '<br/>')}</div></div>`;
+  messages.scrollTop = messages.scrollHeight;
+}
+
+loadDashboard();
+</script>
+</body>
+</html>

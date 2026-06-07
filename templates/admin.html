@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BODH AI — Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--bg:#0a0d14;--surface:#111520;--surface2:#161c2e;--border:#1e2740;--accent:#4f7cff;--accent2:#7c3aed;--text:#e8eaf0;--muted:#6b7280;--success:#10b981;--error:#ef4444}
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+    nav{position:fixed;top:0;left:0;right:0;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:rgba(10,13,20,0.92);backdrop-filter:blur(12px);z-index:100}
+    .logo{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;background:linear-gradient(135deg,#4f7cff,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .nav-right{display:flex;align-items:center;gap:16px}
+    .user-tag{font-size:13px;color:var(--muted)}
+    .btn-sm{padding:7px 16px;border:1px solid var(--border);border-radius:8px;background:none;color:var(--text);font-size:13px;cursor:pointer}
+    .btn-sm:hover{border-color:var(--accent);color:var(--accent)}
+    .layout{display:flex;padding-top:64px;min-height:100vh}
+    sidebar{width:220px;min-height:calc(100vh - 64px);border-right:1px solid var(--border);padding:24px 16px;position:fixed;top:64px;left:0;bottom:0;overflow-y:auto;background:var(--surface)}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:var(--muted);font-size:14px;cursor:pointer;transition:all 0.15s;margin-bottom:4px;border:none;background:none;width:100%;text-align:left}
+    .nav-item:hover{color:var(--text);background:var(--surface2)}
+    .nav-item.active{color:var(--accent);background:rgba(79,124,255,0.08)}
+    main{margin-left:220px;padding:32px;flex:1}
+    h2{font-family:'Syne',sans-serif;font-size:26px;font-weight:700;margin-bottom:8px}
+    .page-sub{color:var(--muted);font-size:14px;margin-bottom:28px}
+    .page{display:none}.page.active{display:block}
+    .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+    .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px}
+    .stat-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px}
+    .stat-val{font-family:'Syne',sans-serif;font-size:32px;font-weight:700}
+    .stat-val.blue{color:var(--accent)}.stat-val.green{color:var(--success)}.stat-val.purple{color:var(--accent2)}.stat-val.orange{color:#f59e0b}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px}
+    .section-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:16px}
+    .empty{text-align:center;color:var(--muted);padding:40px;font-size:14px}
+    table{width:100%;border-collapse:collapse;font-size:14px}
+    th{text-align:left;padding:10px 14px;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border)}
+    td{padding:12px 14px;border-bottom:1px solid rgba(30,39,64,0.5)}
+    tr:last-child td{border-bottom:none}
+    .badge{display:inline-block;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:500}
+    .badge-blue{background:rgba(79,124,255,0.12);color:#4f7cff}
+    .badge-green{background:rgba(16,185,129,0.12);color:#10b981}
+    .badge-purple{background:rgba(124,58,237,0.12);color:#7c3aed}
+    .badge-orange{background:rgba(245,158,11,0.12);color:#f59e0b}
+    .btn{padding:9px 18px;border-radius:9px;border:none;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.15s}
+    .btn-primary{background:var(--accent);color:white}
+    .btn-primary:hover{background:#3d6bff}
+    .alert{padding:12px 14px;border-radius:10px;font-size:13px;margin-bottom:16px}
+    .alert.success{background:rgba(16,185,129,0.1);color:#6ee7b7}
+    .alert.error{background:rgba(239,68,68,0.1);color:#fca5a5}
+  </style>
+</head>
+<body>
+<nav>
+  <div class="logo">BODH AI</div>
+  <div class="nav-right">
+    <span class="user-tag" id="userTag">Admin</span>
+    <button class="btn-sm" onclick="logout()">Sign out</button>
+  </div>
+</nav>
+
+<div class="layout">
+  <sidebar>
+    <button class="nav-item active" onclick="showPage('home')">🏠 Overview</button>
+    <button class="nav-item" onclick="showPage('users')">👥 All Users</button>
+    <button class="nav-item" onclick="showPage('courses')">📚 All Courses</button>
+    <button class="nav-item" onclick="showPage('seed')">🌱 Demo Data</button>
+  </sidebar>
+
+  <main>
+    <!-- OVERVIEW -->
+    <div class="page active" id="page-home">
+      <h2>Platform Overview</h2>
+      <p class="page-sub">Real-time stats across the entire platform</p>
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-label">Total Users</div><div class="stat-val blue" id="sTotal">—</div></div>
+        <div class="stat-card"><div class="stat-label">Students</div><div class="stat-val green" id="sStudents">—</div></div>
+        <div class="stat-card"><div class="stat-label">Teachers</div><div class="stat-val purple" id="sTeachers">—</div></div>
+        <div class="stat-card"><div class="stat-label">Courses</div><div class="stat-val orange" id="sCourses">—</div></div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-label">Assignments</div><div class="stat-val blue" id="sAssignments">—</div></div>
+        <div class="stat-card"><div class="stat-label">Submissions</div><div class="stat-val" id="sSubmissions">—</div></div>
+        <div class="stat-card"><div class="stat-label">Auto-Graded</div><div class="stat-val green" id="sGraded">—</div></div>
+        <div class="stat-card"><div class="stat-label">Grading Rate</div><div class="stat-val purple" id="sGradeRate">—</div></div>
+      </div>
+    </div>
+
+    <!-- USERS -->
+    <div class="page" id="page-users">
+      <h2>All Users</h2>
+      <p class="page-sub">Every registered account on the platform</p>
+      <div class="card">
+        <table>
+          <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th></tr></thead>
+          <tbody id="userTable"><tr><td colspan="4" style="text-align:center;color:var(--muted);padding:32px">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- COURSES -->
+    <div class="page" id="page-courses">
+      <h2>All Courses</h2>
+      <p class="page-sub">Every course on the platform</p>
+      <div class="card">
+        <table>
+          <thead><tr><th>Title</th><th>Teacher</th><th>Created</th></tr></thead>
+          <tbody id="courseTable"><tr><td colspan="3" style="text-align:center;color:var(--muted);padding:32px">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SEED -->
+    <div class="page" id="page-seed">
+      <h2>Demo Data</h2>
+      <p class="page-sub">Seed the platform with demo users, courses, assignments and graded submissions for testing</p>
+      <div class="card" style="max-width:480px">
+        <p style="font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:20px">
+          This will create:<br/>
+          • Admin, Teacher, and 2 Student accounts<br/>
+          • 2 Courses with enrollments<br/>
+          • 3 Assignments with rubric keywords<br/>
+          • Sample submissions — auto-graded instantly
+        </p>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:20px">
+          Demo credentials after seeding:<br/>
+          <strong style="color:var(--text)">teacher@demo.com</strong> / teacher123<br/>
+          <strong style="color:var(--text)">student@demo.com</strong> / student123
+        </p>
+        <div id="seedAlert"></div>
+        <button class="btn btn-primary" onclick="seedData()">Seed Demo Data</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const API = window.location.origin;
+const token = localStorage.getItem('token');
+const user = JSON.parse(localStorage.getItem('user') || 'null');
+if (!token || !user || user.role !== 'admin') window.location.href = '/';
+document.getElementById('userTag').textContent = user?.name || 'Admin';
+
+async function api(path, options = {}) {
+  const res = await fetch(`${API}${path}`, {
+    ...options, headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', ...options.headers }
+  });
+  return res.json();
+}
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`page-${name}`).classList.add('active');
+  event?.target?.classList.add('active');
+  if (name === 'users') loadUsers();
+  if (name === 'courses') loadCourses();
+}
+
+function logout() { localStorage.clear(); window.location.href = '/'; }
+
+const roleBadge = r => ({
+  admin: '<span class="badge badge-orange">Admin</span>',
+  teacher: '<span class="badge badge-purple">Teacher</span>',
+  student: '<span class="badge badge-green">Student</span>'
+}[r] || r);
+
+async function loadStats() {
+  const res = await api('/api/admin/stats');
+  const s = res.data || {};
+  document.getElementById('sTotal').textContent = s.total_users ?? '—';
+  document.getElementById('sStudents').textContent = s.total_students ?? '—';
+  document.getElementById('sTeachers').textContent = s.total_teachers ?? '—';
+  document.getElementById('sCourses').textContent = s.total_courses ?? '—';
+  document.getElementById('sAssignments').textContent = s.total_assignments ?? '—';
+  document.getElementById('sSubmissions').textContent = s.total_submissions ?? '—';
+  document.getElementById('sGraded').textContent = s.total_graded ?? '—';
+  const rate = s.total_submissions > 0
+    ? Math.round((s.total_graded / s.total_submissions) * 100) + '%'
+    : '—';
+  document.getElementById('sGradeRate').textContent = rate;
+}
+
+async function loadUsers() {
+  const res = await api('/api/admin/users');
+  const users = res.data || [];
+  document.getElementById('userTable').innerHTML = users.length
+    ? users.map(u => `
+        <tr>
+          <td><strong>${u.name}</strong></td>
+          <td style="color:var(--muted)">${u.email}</td>
+          <td>${roleBadge(u.role)}</td>
+          <td style="font-size:12px;color:var(--muted)">${u.created_at?.split('T')[0] || ''}</td>
+        </tr>`).join('')
+    : '<tr><td colspan="4" class="empty">No users found</td></tr>';
+}
+
+async function loadCourses() {
+  const res = await api('/api/courses');
+  const courses = res.data || [];
+  document.getElementById('courseTable').innerHTML = courses.length
+    ? courses.map(c => `
+        <tr>
+          <td><strong>${c.title}</strong><br/><span style="font-size:12px;color:var(--muted)">${c.description || ''}</span></td>
+          <td>${c.teacher_name || '—'}</td>
+          <td style="font-size:12px;color:var(--muted)">${c.created_at?.split('T')[0] || ''}</td>
+        </tr>`).join('')
+    : '<tr><td colspan="3" class="empty">No courses found</td></tr>';
+}
+
+async function seedData() {
+  const btn = event.target;
+  btn.disabled = true; btn.textContent = 'Seeding...';
+  const res = await api('/api/admin/seed', { method: 'POST' });
+  const alertDiv = document.getElementById('seedAlert');
+  if (res.status === 'success') {
+    alertDiv.innerHTML = '<div class="alert success">✅ Demo data seeded successfully! You can now log in as teacher@demo.com or student@demo.com</div>';
+    loadStats();
+  } else {
+    alertDiv.innerHTML = `<div class="alert error">${res.message}</div>`;
+  }
+  btn.disabled = false; btn.textContent = 'Seed Demo Data';
+}
+
+loadStats();
+</script>
+</body>
+</html>

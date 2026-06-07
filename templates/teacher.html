@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BODH AI — Teacher Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+  <style>
+    :root { --bg:#0a0d14;--surface:#111520;--surface2:#161c2e;--border:#1e2740;--accent:#4f7cff;--accent2:#7c3aed;--text:#e8eaf0;--muted:#6b7280;--success:#10b981;--error:#ef4444; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+    nav{position:fixed;top:0;left:0;right:0;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:rgba(10,13,20,0.92);backdrop-filter:blur(12px);z-index:100}
+    .logo{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;background:linear-gradient(135deg,#4f7cff,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .nav-right{display:flex;align-items:center;gap:16px}
+    .user-tag{font-size:13px;color:var(--muted)}
+    .btn-sm{padding:7px 16px;border:1px solid var(--border);border-radius:8px;background:none;color:var(--text);font-size:13px;cursor:pointer}
+    .btn-sm:hover{border-color:var(--accent);color:var(--accent)}
+    .layout{display:flex;padding-top:64px;min-height:100vh}
+    sidebar{width:220px;min-height:calc(100vh - 64px);border-right:1px solid var(--border);padding:24px 16px;position:fixed;top:64px;left:0;bottom:0;overflow-y:auto;background:var(--surface)}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:var(--muted);font-size:14px;cursor:pointer;transition:all 0.15s;margin-bottom:4px;border:none;background:none;width:100%;text-align:left}
+    .nav-item:hover{color:var(--text);background:var(--surface2)}
+    .nav-item.active{color:var(--accent);background:rgba(79,124,255,0.08)}
+    main{margin-left:220px;padding:32px;flex:1}
+    h2{font-family:'Syne',sans-serif;font-size:26px;font-weight:700;margin-bottom:8px}
+    .page-sub{color:var(--muted);font-size:14px;margin-bottom:28px}
+    .page{display:none}
+    .page.active{display:block}
+    .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+    .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px}
+    .stat-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px}
+    .stat-val{font-family:'Syne',sans-serif;font-size:28px;font-weight:700}
+    .stat-val.blue{color:var(--accent)}.stat-val.green{color:var(--success)}.stat-val.purple{color:var(--accent2)}
+    .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;transition:border-color 0.15s}
+    .card:hover{border-color:rgba(79,124,255,0.4)}
+    .card-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:6px}
+    .card-meta{font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.5}
+    .btn{padding:9px 18px;border-radius:9px;border:none;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.15s}
+    .btn-primary{background:var(--accent);color:white}
+    .btn-primary:hover{background:#3d6bff}
+    .btn-outline{background:none;border:1px solid var(--border);color:var(--text)}
+    .btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+    .btn-sm2{padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text);font-size:13px;cursor:pointer}
+    .form-group{margin-bottom:16px}
+    label{display:block;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:6px}
+    input,select,textarea{width:100%;padding:11px 14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color 0.15s}
+    input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);z-index:200;align-items:center;justify-content:center;padding:24px}
+    .modal-overlay.open{display:flex}
+    .modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:36px;width:100%;max-width:480px;position:relative;max-height:90vh;overflow-y:auto}
+    .modal-close{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px}
+    .modal-close:hover{background:var(--surface2);color:var(--text)}
+    .modal h3{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:20px}
+    .badge{display:inline-block;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:500}
+    .badge-blue{background:rgba(79,124,255,0.12);color:#4f7cff}
+    .badge-green{background:rgba(16,185,129,0.12);color:#10b981}
+    .score-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin:8px 0}
+    .score-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#4f7cff,#7c3aed);transition:width 0.6s ease}
+    .section-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:16px}
+    .empty{text-align:center;color:var(--muted);padding:40px;font-size:14px}
+    .alert{padding:12px 14px;border-radius:10px;font-size:13px;margin-bottom:16px}
+    .alert.error{background:rgba(239,68,68,0.1);color:#fca5a5}
+    .alert.success{background:rgba(16,185,129,0.1);color:#6ee7b7}
+    table{width:100%;border-collapse:collapse;font-size:14px}
+    th{text-align:left;padding:10px 14px;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border)}
+    td{padding:12px 14px;border-bottom:1px solid rgba(30,39,64,0.5)}
+    tr:last-child td{border-bottom:none}
+    .ai-output{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:20px;font-size:14px;line-height:1.7;white-space:pre-wrap;margin-top:16px}
+  </style>
+</head>
+<body>
+<nav>
+  <div class="logo">BODH AI</div>
+  <div class="nav-right">
+    <span class="user-tag" id="userTag">Teacher</span>
+    <button class="btn-sm" onclick="logout()">Sign out</button>
+  </div>
+</nav>
+
+<div class="layout">
+  <sidebar>
+    <button class="nav-item active" onclick="showPage('home')">🏠 Dashboard</button>
+    <button class="nav-item" onclick="showPage('courses')">📚 My Courses</button>
+    <button class="nav-item" onclick="showPage('create')">➕ Create Course</button>
+    <button class="nav-item" onclick="showPage('ai')">🤖 AI Content</button>
+  </sidebar>
+
+  <main>
+    <!-- HOME -->
+    <div class="page active" id="page-home">
+      <h2 id="welcomeMsg">Teacher Dashboard</h2>
+      <p class="page-sub">Manage your courses and track student progress</p>
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-label">My Courses</div><div class="stat-val blue" id="statCourses">—</div></div>
+        <div class="stat-card"><div class="stat-label">Total Students</div><div class="stat-val" id="statStudents">—</div></div>
+        <div class="stat-card"><div class="stat-label">Assignments</div><div class="stat-val green" id="statAssignments">—</div></div>
+        <div class="stat-card"><div class="stat-label">Submissions</div><div class="stat-val purple" id="statSubmissions">—</div></div>
+      </div>
+      <div class="section-title">Your Courses</div>
+      <div class="card-grid" id="homeCourseList"><div class="empty">Loading...</div></div>
+    </div>
+
+    <!-- COURSES -->
+    <div class="page" id="page-courses">
+      <h2>My Courses</h2>
+      <p class="page-sub">Click a course to manage assignments and view submissions</p>
+      <div id="courseDetail"></div>
+    </div>
+
+    <!-- CREATE COURSE -->
+    <div class="page" id="page-create">
+      <h2>Create Course</h2>
+      <p class="page-sub">Set up a new course for your students</p>
+      <div class="card" style="max-width:560px">
+        <div class="form-group"><label>Course Title *</label><input id="newTitle" placeholder="e.g. Introduction to Machine Learning"/></div>
+        <div class="form-group"><label>Description</label><textarea id="newDesc" rows="3" placeholder="What will students learn?"></textarea></div>
+        <div id="createAlert"></div>
+        <button class="btn btn-primary" onclick="createCourse()">Create Course</button>
+      </div>
+    </div>
+
+    <!-- AI CONTENT -->
+    <div class="page" id="page-ai">
+      <h2>AI Content Generator</h2>
+      <p class="page-sub">Generate lesson summaries, quiz questions, or concept explanations</p>
+      <div class="card" style="max-width:600px">
+        <div class="form-group">
+          <label>Content Type</label>
+          <select id="aiType">
+            <option value="summary">Lesson Summary</option>
+            <option value="quiz">Quiz Questions (5 MCQs)</option>
+            <option value="explanation">Concept Explanation</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Topic *</label><input id="aiTopic" placeholder="e.g. Backpropagation in Neural Networks"/></div>
+        <div class="form-group"><label>Additional Details (optional)</label><input id="aiDetails" placeholder="Focus on specific aspects..."/></div>
+        <button class="btn btn-primary" onclick="generateContent()" id="genBtn">Generate</button>
+        <div id="aiOutput"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Assignment Modal -->
+<div class="modal-overlay" id="assignModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h3>Create Assignment</h3>
+    <div class="form-group"><label>Title *</label><input id="aTitle" placeholder="Assignment title"/></div>
+    <div class="form-group"><label>Description</label><textarea id="aDesc" rows="2" placeholder="What should students do?"></textarea></div>
+    <div class="form-group">
+      <label>Rubric Keywords * <span style="font-size:11px;color:var(--muted)">(comma-separated, used for auto-grading)</span></label>
+      <input id="aKeywords" placeholder="e.g. photosynthesis, chlorophyll, glucose, sunlight"/>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group"><label>Max Score</label><input type="number" id="aMaxScore" value="100" min="1"/></div>
+      <div class="form-group"><label>Due Date</label><input type="date" id="aDueDate"/></div>
+    </div>
+    <div id="assignAlert"></div>
+    <button class="btn btn-primary" style="width:100%" onclick="createAssignment()">Create Assignment</button>
+  </div>
+</div>
+
+<script>
+const API = window.location.origin;
+const token = localStorage.getItem('token');
+const user = JSON.parse(localStorage.getItem('user') || 'null');
+if (!token || !user || user.role !== 'teacher') window.location.href = '/';
+
+document.getElementById('userTag').textContent = user?.name || 'Teacher';
+document.getElementById('welcomeMsg').textContent = `Welcome, ${user?.name?.split(' ')[0]}!`;
+
+let activeCourseId = null;
+
+async function api(path, options = {}) {
+  const res = await fetch(`${API}${path}`, {
+    ...options, headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', ...options.headers }
+  });
+  return res.json();
+}
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`page-${name}`).classList.add('active');
+  event?.target?.classList.add('active');
+  if (name === 'courses') loadCoursesPage();
+}
+
+function logout() { localStorage.clear(); window.location.href = '/'; }
+function closeModal() { document.getElementById('assignModal').classList.remove('open'); }
+
+async function loadDashboard() {
+  const res = await api('/api/courses');
+  const courses = res.data || [];
+  document.getElementById('statCourses').textContent = courses.length;
+
+  let totalStudents = 0, totalAssignments = 0, totalSubs = 0;
+
+  const list = document.getElementById('homeCourseList');
+  if (!courses.length) { list.innerHTML = '<div class="empty">No courses yet. Create one!</div>'; return; }
+
+  const details = await Promise.all(courses.map(c => api(`/api/courses/${c.id}`)));
+  details.forEach(d => {
+    totalStudents += d.data?.student_count || 0;
+    totalAssignments += d.data?.assignments?.length || 0;
+  });
+
+  document.getElementById('statStudents').textContent = totalStudents;
+  document.getElementById('statAssignments').textContent = totalAssignments;
+
+  list.innerHTML = courses.map((c, i) => `
+    <div class="card" onclick="openCourse(${c.id})">
+      <div class="card-title">${c.title}</div>
+      <div class="card-meta">${c.description || 'No description'}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <span class="badge badge-blue">${details[i]?.data?.student_count || 0} students</span>
+        <span class="badge badge-green">${details[i]?.data?.assignments?.length || 0} assignments</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function loadCoursesPage() {
+  const res = await api('/api/courses');
+  const courses = res.data || [];
+  const div = document.getElementById('courseDetail');
+  if (!courses.length) { div.innerHTML = '<div class="empty">No courses yet.</div>'; return; }
+
+  div.innerHTML = `
+    <div class="card-grid" style="margin-bottom:24px">
+      ${courses.map(c => `
+        <div class="card" onclick="openCourse(${c.id})" style="cursor:pointer">
+          <div class="card-title">${c.title}</div>
+          <div class="card-meta">${c.description || ''}</div>
+          <span class="badge badge-blue">View Course →</span>
+        </div>`).join('')}
+    </div>
+    <div id="courseExpanded"></div>`;
+}
+
+async function openCourse(courseId) {
+  activeCourseId = courseId;
+  showPage('courses');
+  const res = await api(`/api/courses/${courseId}`);
+  const { course, assignments, student_count } = res.data || {};
+  const analyticsRes = await api(`/api/courses/${courseId}/analytics`);
+  const analytics = analyticsRes.data;
+
+  const div = document.getElementById('courseExpanded') || document.getElementById('courseDetail');
+
+  div.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div>
+        <h2 style="margin-bottom:4px">${course?.title}</h2>
+        <p style="color:var(--muted);font-size:14px">${course?.description || ''}</p>
+      </div>
+      <button class="btn btn-primary" onclick="openAssignModal()">+ Add Assignment</button>
+    </div>
+
+    <div class="stats-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:24px">
+      <div class="stat-card"><div class="stat-label">Students</div><div class="stat-val blue">${student_count}</div></div>
+      <div class="stat-card"><div class="stat-label">Assignments</div><div class="stat-val">${assignments?.length || 0}</div></div>
+      <div class="stat-card"><div class="stat-label">Engagement</div><div class="stat-val green">${analytics?.engagement?.submission_rate || 0}%</div></div>
+    </div>
+
+    <div class="section-title">Assignments & Submissions</div>
+    ${!assignments?.length ? '<div class="empty">No assignments yet.</div>' :
+      assignments.map(a => {
+        const stats = analytics?.assignments?.find(x => x.assignment.id === a.id)?.stats;
+        return `
+          <div class="card" style="margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;align-items:start">
+              <div>
+                <div class="card-title">${a.title}</div>
+                <div style="font-size:13px;color:var(--muted);margin-top:4px">${a.description || ''}</div>
+                <div style="font-size:12px;color:var(--muted);margin-top:4px">Max: ${a.max_score} | Keywords: <em>${a.rubric_keywords}</em></div>
+              </div>
+              <button class="btn btn-outline" onclick="loadSubmissions(${a.id},'${a.title}',${a.max_score})">View Submissions</button>
+            </div>
+            ${stats ? `
+              <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(4,1fr);gap:12px;font-size:13px">
+                <div><div style="color:var(--muted);margin-bottom:2px">Submitted</div><strong>${stats.submission_count}</strong></div>
+                <div><div style="color:var(--muted);margin-bottom:2px">Avg Score</div><strong>${stats.average_score}</strong></div>
+                <div><div style="color:var(--muted);margin-bottom:2px">Pass Rate</div><strong>${stats.pass_rate}%</strong></div>
+                <div><div style="color:var(--muted);margin-bottom:2px">Top Score</div><strong>${stats.highest_score}</strong></div>
+              </div>` : ''}
+          </div>`;
+      }).join('')}
+    <div id="submissionsPanel"></div>`;
+}
+
+async function loadSubmissions(assignmentId, title, maxScore) {
+  const res = await api(`/api/assignments/${assignmentId}/submissions`);
+  const { submissions, analytics } = res.data || {};
+  const panel = document.getElementById('submissionsPanel');
+
+  panel.innerHTML = `
+    <div style="margin-top:24px">
+      <div class="section-title">Submissions — ${title}</div>
+      ${!submissions?.length ? '<div class="empty">No submissions yet.</div>' : `
+        <div style="margin-bottom:16px;padding:16px;background:var(--surface2);border-radius:12px;font-size:13px">
+          ${analytics?.struggling_students?.length ? `<span style="color:var(--error)">⚠️ Struggling: ${analytics.struggling_students.join(', ')}</span>` : ''}
+          ${analytics?.top_students?.length ? ` &nbsp;|&nbsp; <span style="color:var(--success)">🌟 Top: ${analytics.top_students.join(', ')}</span>` : ''}
+        </div>
+        <table>
+          <thead><tr><th>Student</th><th>Score</th><th>Performance</th><th>Submitted</th></tr></thead>
+          <tbody>
+            ${submissions.map(s => {
+              const pct = s.score != null ? Math.round((s.score / maxScore) * 100) : null;
+              return `<tr>
+                <td><strong>${s.student_name}</strong></td>
+                <td>${s.score != null ? `${s.score}/${maxScore}` : 'Not graded'}</td>
+                <td style="width:140px">
+                  ${pct != null ? `<div class="score-bar"><div class="score-fill" style="width:${pct}%"></div></div><div style="font-size:11px;color:var(--muted)">${pct}%</div>` : '—'}
+                </td>
+                <td style="font-size:12px;color:var(--muted)">${s.submitted_at?.split('T')[0] || ''}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>`}
+    </div>`;
+  panel.scrollIntoView({ behavior: 'smooth' });
+}
+
+function openAssignModal() {
+  document.getElementById('assignModal').classList.add('open');
+  document.getElementById('assignAlert').innerHTML = '';
+}
+
+async function createCourse() {
+  const title = document.getElementById('newTitle').value.trim();
+  if (!title) return;
+  const res = await api('/api/courses', { method: 'POST', body: JSON.stringify({ title, description: document.getElementById('newDesc').value.trim() }) });
+  const alertDiv = document.getElementById('createAlert');
+  if (res.status === 'success') {
+    alertDiv.innerHTML = '<div class="alert success">Course created!</div>';
+    document.getElementById('newTitle').value = '';
+    document.getElementById('newDesc').value = '';
+    loadDashboard();
+    setTimeout(() => showPage('courses'), 1000);
+  } else {
+    alertDiv.innerHTML = `<div class="alert error">${res.message}</div>`;
+  }
+}
+
+async function createAssignment() {
+  const title = document.getElementById('aTitle').value.trim();
+  const keywords = document.getElementById('aKeywords').value.trim();
+  if (!title || !keywords) {
+    document.getElementById('assignAlert').innerHTML = '<div class="alert error">Title and keywords are required.</div>';
+    return;
+  }
+  const res = await api(`/api/courses/${activeCourseId}/assignments`, {
+    method: 'POST',
+    body: JSON.stringify({
+      title, description: document.getElementById('aDesc').value.trim(),
+      rubric_keywords: keywords,
+      max_score: parseInt(document.getElementById('aMaxScore').value) || 100,
+      due_date: document.getElementById('aDueDate').value
+    })
+  });
+  if (res.status === 'success') {
+    closeModal();
+    openCourse(activeCourseId);
+  } else {
+    document.getElementById('assignAlert').innerHTML = `<div class="alert error">${res.message}</div>`;
+  }
+}
+
+async function generateContent() {
+  const type = document.getElementById('aiType').value;
+  const topic = document.getElementById('aiTopic').value.trim();
+  const details = document.getElementById('aiDetails').value.trim();
+  if (!topic) return alert('Please enter a topic.');
+
+  const btn = document.getElementById('genBtn');
+  btn.disabled = true; btn.textContent = 'Generating...';
+
+  const res = await api('/api/ai/generate-content', { method: 'POST', body: JSON.stringify({ type, topic, details }) });
+  btn.disabled = false; btn.textContent = 'Generate';
+
+  if (res.status === 'success') {
+    document.getElementById('aiOutput').innerHTML = `<div class="ai-output">${res.data.content}</div>`;
+  } else {
+    document.getElementById('aiOutput').innerHTML = `<div class="alert error">${res.message}</div>`;
+  }
+}
+
+loadDashboard();
+</script>
+</body>
+</html>
