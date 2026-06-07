@@ -4,4 +4,4 @@ python-dotenv==1.0.1
 PyJWT==2.8.0
 google-generativeai==0.7.2
 gunicorn==22.0.0
-protbuf==4.25.3
+protbuf>=3.20.0
