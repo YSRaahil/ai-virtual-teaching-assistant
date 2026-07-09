@@ -17,6 +17,8 @@ env/
 *.egg-info/
 dist/
 build/
+chroma_db/
+evals/results/
 
 # IDE
 .vscode/
