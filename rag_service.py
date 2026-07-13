@@ -57,25 +57,13 @@ def _get_collection(course_id: int) -> chromadb.Collection:
 
 # ─── CHUNKING HELPER ─────────────────────────────────────────────────────────
 
-def chunk_text(text: str, chunk_size: int = 300, overlap: int = 50) -> list[str]:
-    """
-    Split raw text into overlapping word-level chunks.
-
-    Args:
-        text:       Raw extracted text from a PDF page or document.
-        chunk_size: Target words per chunk (default 300 ≈ ~400 tokens).
-        overlap:    Words to repeat at start of next chunk for context continuity.
-
-    Returns:
-        List of chunk strings.
-
-    Why word-level not character-level:
-        Sentence transformers work on semantic units. Word boundaries are more
-        natural split points than arbitrary character counts.
-    """
-    words = text.split()
-    if not words:
+def chunk_text(text: str, chunk_size: int = 300, overlap: int = 50) -> list:
+    if not text or not text.strip():
         return []
+
+    words = text.split()
+    if len(words) <= chunk_size:
+        return [text.strip()]
 
     chunks = []
     start = 0
@@ -85,11 +73,13 @@ def chunk_text(text: str, chunk_size: int = 300, overlap: int = 50) -> list[str]
         chunk = " ".join(words[start:end])
         if chunk.strip():
             chunks.append(chunk.strip())
-        start += chunk_size - overlap  # slide with overlap
+        start = end - overlap  # ← key fix: slide back by overlap
+
+        # Safety: if remaining words less than overlap, stop
+        if end == len(words):
+            break
 
     return chunks
-
-
 # ─── PUBLIC API ──────────────────────────────────────────────────────────────
 
 def ingest(chunks: list[str], course_id: int, source_filename: str) -> dict:

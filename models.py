@@ -6,7 +6,6 @@ All DB interaction lives here. Routes never touch SQL directly.
 import sqlite3
 import hashlib
 import os
-from datetime import datetime
 
 DB_PATH = os.getenv("DB_PATH", "teaching_assistant.db")
 

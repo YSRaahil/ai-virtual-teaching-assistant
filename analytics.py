@@ -5,7 +5,6 @@ No DB calls here — data is passed in from routes.
 """
 
 from collections import defaultdict
-from typing import Optional
 
 
 def student_performance_summary(grades: list[dict]) -> dict:

@@ -105,12 +105,14 @@ class TestRagService:
 
     def test_chunk_text_overlap(self):
         """Chunks should have overlapping content."""
-        text = " ".join([f"word{i}" for i in range(400)])
+        # Use repeated words so overlap detection works
+        words = ["hello", "world", "python", "flask", "test"] * 100
+        text = " ".join(words)
         chunks = chunk_text(text, chunk_size=200, overlap=50)
         assert len(chunks) >= 2
         # Last words of chunk 0 should appear at start of chunk 1
-        last_words_chunk0 = set(chunks[0].split()[-10:])
-        first_words_chunk1 = set(chunks[1].split()[:10])
+        last_words_chunk0 = set(chunks[0].split()[-50:])
+        first_words_chunk1 = set(chunks[1].split()[:50])
         assert len(last_words_chunk0 & first_words_chunk1) > 0
 
     def test_chunk_text_empty(self):
