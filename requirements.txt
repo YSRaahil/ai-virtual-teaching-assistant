@@ -7,4 +7,4 @@ gunicorn==22.0.0
 chromadb==0.5.3
 sentence-transformers==3.0.1
 pymupdf==1.24.5
-
+groq>=0.1

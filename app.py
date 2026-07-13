@@ -19,7 +19,7 @@ import grading
 import analytics
 from auth import login_required,role_required,generate_token,get_current_user
 from rag_service import ingest, retrieve,collection_stats, chunk_text
-import tool_service
+import tool_service # noqa: F401
 # ─── SETUP
 load_dotenv()
 logging.basicConfig(level=logging.INFO,format="%(asctime)s [%(levelname)s] %(message)s")

@@ -16,11 +16,12 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from dotenv import load_dotenv
 load_dotenv()
 
-from groq import Groq
-
-
 @pytest.fixture(scope="module")
 def groq_client():
+    try:
+        from groq import Groq
+    except ImportError:
+        pytest.skip("groq-sdk not installed. Install with `pip install groq`")    
     api_key = os.getenv("GROQ_API_KEY")
     if not api_key:
         pytest.skip("GROQ_API_KEY not set in .env")
