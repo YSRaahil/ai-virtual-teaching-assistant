@@ -9,11 +9,8 @@ import os
 from functools import wraps
 from datetime import datetime, timedelta
 from flask import request, jsonify, session
-
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-change-in-production")
 TOKEN_EXPIRY_HOURS = 24
-
-
 def generate_token(user: dict) -> str:
     """Generate a JWT for the given user."""
     payload = {

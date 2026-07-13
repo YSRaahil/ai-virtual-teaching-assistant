@@ -16,11 +16,11 @@ Used by:
 """
 
 import os
+
 import logging
 import chromadb
 from chromadb.config import Settings
 from embedding_service import embed, embed_batch
-
 log = logging.getLogger(__name__)
 
 # ─── CHROMADB CLIENT (once at startup) ───────────────────────────────────────
@@ -147,14 +147,14 @@ def ingest(chunks: list[str], course_id: int, source_filename: str) -> dict:
     }
 
 
-def retrieve(query: str, course_id: int, k: int = 3) -> list[dict]:
+def retrieve(query: str, course_id: int, k: int = 5) -> list[dict]:
     """
     Retrieve the top-k most relevant chunks for a student's query.
 
     Args:
         query:     The student's question string.
         course_id: Scope retrieval to this course's collection only.
-        k:         Number of chunks to return (default 3).
+        k:         Number of chunks to return (default 5).
 
     Returns:
         List of dicts, each with:

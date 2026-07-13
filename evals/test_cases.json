@@ -1,0 +1,169 @@
+[
+  {
+    "id": "tc_001",
+    "question": "What is gradient descent and how does it minimize loss?",
+    "expected_topics": ["gradient descent", "loss function", "optimization", "learning rate"],
+    "expected_context_keywords": ["gradient", "loss", "minimize", "iterative"],
+    "category": "rag",
+    "course_id": 1
+  },
+  {
+    "id": "tc_002",
+    "question": "Explain backpropagation and the chain rule.",
+    "expected_topics": ["backpropagation", "chain rule", "gradients", "neural network"],
+    "expected_context_keywords": ["backprop", "chain", "gradient", "derivative"],
+    "category": "rag",
+    "course_id": 1
+  },
+  {
+    "id": "tc_003",
+    "question": "What causes overfitting and how can we prevent it?",
+    "expected_topics": ["overfitting", "regularization", "dropout", "generalization"],
+    "expected_context_keywords": ["overfit", "regulariz", "dropout", "training"],
+    "category": "rag",
+    "course_id": 1
+  },
+  {
+    "id": "tc_004",
+    "question": "What is the difference between supervised and unsupervised learning?",
+    "expected_topics": ["supervised learning", "unsupervised learning", "labels", "clustering"],
+    "expected_context_keywords": ["supervised", "unsupervised", "label", "data"],
+    "category": "rag",
+    "course_id": 1
+  },
+  {
+    "id": "tc_005",
+    "question": "How does a convolutional neural network work?",
+    "expected_topics": ["CNN", "convolution", "filters", "feature maps", "pooling"],
+    "expected_context_keywords": ["convolution", "filter", "feature", "pool"],
+    "category": "rag",
+    "course_id": 1
+  },
+  {
+    "id": "tc_006",
+    "question": "What is the vanishing gradient problem?",
+    "expected_topics": ["vanishing gradient", "deep networks", "activation functions", "ReLU"],
+    "expected_context_keywords": ["vanishing", "gradient", "deep", "activation"],
+    "category": "rag",
+    "course_id": 1
+  },
+  {
+    "id": "tc_007",
+    "question": "Explain the attention mechanism in transformers.",
+    "expected_topics": ["attention", "transformer", "query", "key", "value"],
+    "expected_context_keywords": ["attention", "transformer", "query", "key"],
+    "category": "rag",
+    "course_id": 1
+  },
+  {
+    "id": "tc_008",
+    "question": "What is transfer learning and when should I use it?",
+    "expected_topics": ["transfer learning", "pretrained", "fine-tuning", "features"],
+    "expected_context_keywords": ["transfer", "pretrain", "fine-tun", "feature"],
+    "category": "rag",
+    "course_id": 1
+  },
+  {
+    "id": "tc_009",
+    "question": "How does the learning rate affect model training?",
+    "expected_topics": ["learning rate", "convergence", "training", "step size"],
+    "expected_context_keywords": ["learning rate", "converge", "step", "training"],
+    "category": "rag",
+    "course_id": 1
+  },
+  {
+    "id": "tc_010",
+    "question": "What is batch normalization and why is it useful?",
+    "expected_topics": ["batch normalization", "training stability", "internal covariate shift"],
+    "expected_context_keywords": ["batch", "normaliz", "covariate", "stable"],
+    "category": "rag",
+    "course_id": 1
+  },
+  {
+    "id": "tc_011",
+    "question": "What are my grades?",
+    "expected_topics": ["average", "score", "assignment", "course"],
+    "expected_context_keywords": ["score", "average", "assignment", "performance"],
+    "category": "tool",
+    "expected_tool": "get_student_performance",
+    "course_id": null
+  },
+  {
+    "id": "tc_012",
+    "question": "How am I performing in this course?",
+    "expected_topics": ["average", "score", "assignment", "course"],
+    "expected_context_keywords": ["score", "average", "trend", "performance"],
+    "category": "tool",
+    "expected_tool": "get_student_performance",
+    "course_id": null
+  },
+  {
+    "id": "tc_013",
+    "question": "What topics am I weak in?",
+    "expected_topics": ["weak", "topic", "improve", "focus"],
+    "expected_context_keywords": ["weak", "topic", "improv", "focus"],
+    "category": "tool",
+    "expected_tool": "get_student_performance",
+    "course_id": null
+  },
+  {
+    "id": "tc_014",
+    "question": "I don't understand backpropagation at all, can you help?",
+    "expected_topics": ["backpropagation", "review", "practice", "suggest"],
+    "expected_context_keywords": ["backprop", "chain", "gradient", "suggest"],
+    "category": "tool",
+    "expected_tool": "flag_weak_topic",
+    "course_id": null
+  },
+  {
+    "id": "tc_015",
+    "question": "I'm really struggling with gradient descent.",
+    "expected_topics": ["gradient", "descent", "review", "suggest"],
+    "expected_context_keywords": ["gradient", "descent", "suggest", "review"],
+    "category": "tool",
+    "expected_tool": "flag_weak_topic",
+    "course_id": null
+  },
+  {
+    "id": "tc_016",
+    "question": "What does course 1 cover?",
+    "expected_topics": ["course", "assignment", "material", "title"],
+    "expected_context_keywords": ["course", "cover", "material", "assignment"],
+    "category": "tool",
+    "expected_tool": "get_course_summary",
+    "course_id": 1
+  },
+  {
+    "id": "tc_017",
+    "question": "What study materials are available for course 1?",
+    "expected_topics": ["material", "file", "course", "indexed"],
+    "expected_context_keywords": ["material", "upload", "resource", "file"],
+    "category": "tool",
+    "expected_tool": "get_course_summary",
+    "course_id": 1
+  },
+  {
+    "id": "tc_018",
+    "question": "What is a recurrent neural network?",
+    "expected_topics": ["RNN", "recurrent", "sequence", "hidden state"],
+    "expected_context_keywords": ["recurrent", "sequence", "hidden", "rnn"],
+    "category": "rag",
+    "course_id": 1
+  },
+  {
+    "id": "tc_019",
+    "question": "How does dropout work as a regularization technique?",
+    "expected_topics": ["dropout", "regularization", "overfitting", "training"],
+    "expected_context_keywords": ["dropout", "regulariz", "overfit", "random"],
+    "category": "rag",
+    "course_id": 1
+  },
+  {
+    "id": "tc_020",
+    "question": "What is the difference between precision and recall?",
+    "expected_topics": ["precision", "recall", "F1 score", "classification metrics"],
+    "expected_context_keywords": ["precision", "recall", "F1", "metric"],
+    "category": "rag",
+    "course_id": 1
+  }
+]

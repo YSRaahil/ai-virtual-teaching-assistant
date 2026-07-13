@@ -107,6 +107,24 @@ def init_db():
         )
     """)
 
+    # Materials — tracks PDFs uploaded per course for ChromaDB reload on cold start
+    # One row per file upload. Used by /api/courses/<id>/knowledge-status
+    # and the /knowledge/reload recovery endpoint.
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS materials (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            course_id INTEGER NOT NULL,
+            filename TEXT NOT NULL,
+            original_name TEXT NOT NULL,
+            chunk_count INTEGER NOT NULL DEFAULT 0,
+            uploaded_by INTEGER NOT NULL,
+            uploaded_at TEXT NOT NULL DEFAULT (datetime('now')),
+            FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
+            FOREIGN KEY (uploaded_by) REFERENCES users(id) ON DELETE CASCADE,
+            UNIQUE(course_id, original_name)
+        )
+    """)
+
     conn.commit()
     conn.close()
     print("✅ Database initialised")
@@ -385,6 +403,105 @@ def get_all_users():
     ).fetchall()
     conn.close()
     return [dict(r) for r in rows]
+
+
+# ─── MATERIALS ───────────────────────────────────────────────────────────────
+
+def save_material(course_id: int, filename: str, original_name: str,
+                  chunk_count: int, uploaded_by: int):
+    """
+    Record a successfully ingested PDF in the materials table.
+
+    Args:
+        course_id:     Course this material belongs to.
+        filename:      Sanitised filename used as ChromaDB ID prefix.
+        original_name: Original upload filename shown to the teacher.
+        chunk_count:   Number of chunks ingested into ChromaDB.
+        uploaded_by:   User ID of the teacher who uploaded it.
+
+    Returns:
+        material_id (int) on success.
+        None if the same file was already uploaded for this course (UNIQUE constraint).
+
+    Called by:
+        POST /api/courses/<id>/materials after rag_service.ingest() succeeds.
+    """
+    conn = get_db()
+    try:
+        c = conn.execute(
+            """INSERT INTO materials
+               (course_id, filename, original_name, chunk_count, uploaded_by)
+               VALUES (?, ?, ?, ?, ?)
+               ON CONFLICT(course_id, original_name)
+               DO UPDATE SET chunk_count=excluded.chunk_count,
+                             uploaded_at=datetime('now')""",
+            (course_id, filename, original_name, chunk_count, uploaded_by)
+        )
+        conn.commit()
+        material_id = c.lastrowid
+        conn.close()
+        return material_id
+    except Exception as e:
+        conn.close()
+        raise e
+
+
+def get_materials_by_course(course_id: int):
+    """
+    Return all materials uploaded for a course.
+    Used by GET /api/courses/<id>/knowledge-status.
+
+    Returns:
+        List of dicts with: id, course_id, filename, original_name,
+                            chunk_count, uploaded_by, uploaded_at
+    """
+    conn = get_db()
+    rows = conn.execute(
+        """SELECT m.*, u.name as uploaded_by_name
+           FROM materials m
+           JOIN users u ON m.uploaded_by = u.id
+           WHERE m.course_id = ?
+           ORDER BY m.uploaded_at DESC""",
+        (course_id,)
+    ).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def get_material_filenames(course_id: int) -> list:
+    """
+    Return just the original filenames for a course.
+    Used by the /knowledge/reload endpoint to re-ingest after Render cold start.
+
+    Returns:
+        List of original_name strings.
+    """
+    conn = get_db()
+    rows = conn.execute(
+        "SELECT original_name FROM materials WHERE course_id = ? ORDER BY uploaded_at ASC",
+        (course_id,)
+    ).fetchall()
+    conn.close()
+    return [r["original_name"] for r in rows]
+
+
+def delete_material(course_id: int, original_name: str) -> bool:
+    """
+    Remove a material record from SQLite.
+    Call this alongside rag_service.delete_course_collection() if needed.
+
+    Returns:
+        True if a row was deleted, False if not found.
+    """
+    conn = get_db()
+    c = conn.execute(
+        "DELETE FROM materials WHERE course_id = ? AND original_name = ?",
+        (course_id, original_name)
+    )
+    conn.commit()
+    deleted = c.rowcount > 0
+    conn.close()
+    return deleted
 
 
 def get_platform_stats():
