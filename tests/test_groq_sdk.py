@@ -23,7 +23,7 @@ def groq_client():
     except ImportError:
         pytest.skip("groq-sdk not installed. Install with `pip install groq`")    
     api_key = os.getenv("GROQ_API_KEY")
-    if not api_key:
+    if not api_key or api_key == "*** ":    
         pytest.skip("GROQ_API_KEY not set in .env")
     return Groq(api_key=api_key)
 
