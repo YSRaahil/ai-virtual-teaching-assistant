@@ -76,16 +76,10 @@ jobs:
           DB_PATH: ci_test.db
 
       - name: Run Groq SDK tests
-        if: ${{ secrets.GROQ_API_KEY != '' }}
         run: |
-             pytest tests/test_groq_sdk.py -v --tb=short
+          pytest tests/test_groq_sdk.py -v --tb=short
         env:
               GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-
-      - name: Skip Groq SDK tests (no GROQ_API_KEY)
-        if: ${{ secrets.GROQ_API_KEY == '' }}
-        run: |
-            echo "Skipping Groq SDK tests — GROQ_API_KEY secret not configured."
 
       - name: Run Tool service unit tests (no server)
         run: |
