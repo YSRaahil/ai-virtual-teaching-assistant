@@ -17,6 +17,14 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from dotenv import load_dotenv
 load_dotenv()
 
+# Skip entire module if key is missing or masked
+_key = os.getenv("GROQ_API_KEY", "").strip()
+if not _key or _key in ("***", "REPLACE_ME") or len(_key) < 20:
+    pytest.skip(
+        "GROQ_API_KEY not configured — skipping Groq SDK tests",
+        allow_module_level=True
+    )
+
 
 def _is_valid_key(key: str) -> bool:
     """Check if API key is real — not masked, not empty, not placeholder."""
