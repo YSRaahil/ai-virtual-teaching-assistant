@@ -1,8 +1,8 @@
 """
 test_groq_sdk.py — Groq SDK tests
 ------------------------------------
-Uses mocked responses in CI to avoid real API calls.
-Real API calls only run when GROQ_API_KEY is available and valid.
+Uses mocked responses in CI when GROQ_API_KEY is unavailable.
+Real API calls only run when a valid key is present locally.
 
 Run: pytest tests/test_groq_sdk.py -v
 """
@@ -18,7 +18,22 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+def _is_valid_key(key: str) -> bool:
+    """Check if API key is real — not masked, not empty, not placeholder."""
+    if not key:
+        return False
+    key = key.strip()
+    if key == "***":
+        return False
+    if key.startswith("***") or key.endswith("***"):
+        return False
+    if len(key) < 20:
+        return False
+    return True
+
+
 def _make_mock_client():
+    """Build a mock Groq client."""
     mock_client = Mock()
     mock_response = Mock()
     mock_response.choices = [Mock()]
@@ -27,28 +42,30 @@ def _make_mock_client():
     mock_response.choices[0].delta.content = "OK"
     mock_response.model = "llama-3.3-70b-versatile"
     mock_client.chat.completions.create = Mock(return_value=mock_response)
-    return mock_client, mock_response
+    return mock_client
 
 
 @pytest.fixture(scope="module")
-def groq_client():
+def use_mock():
+    """True if we should use mock instead of real API."""
+    return not _is_valid_key(os.getenv("GROQ_API_KEY", ""))
+
+
+@pytest.fixture(scope="module")
+def groq_client(use_mock):
+    """
+    Return mock client in CI (no valid key),
+    real Groq client when running locally with a valid key.
+    """
+    if use_mock:
+        return _make_mock_client()
+
     try:
         from groq import Groq
     except ImportError:
         pytest.skip("groq SDK not installed")
 
-    api_key = os.getenv("GROQ_API_KEY", "")
-    if not api_key or api_key.strip() == "***" or len(api_key) < 10:
-        mock_client, _ = _make_mock_client()
-        return mock_client
-
-    return Groq(api_key=api_key)
-
-
-@pytest.fixture(scope="module")
-def is_mocked():
-    api_key = os.getenv("GROQ_API_KEY", "")
-    return not api_key or api_key.strip() == "***" or len(api_key) < 10
+    return Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 
 class TestGroqSDK:
@@ -86,8 +103,8 @@ class TestGroqSDK:
         )
         assert "llama" in response.model.lower()
 
-    def test_streaming(self, groq_client, is_mocked):
-        if is_mocked:
+    def test_streaming(self, groq_client, use_mock):
+        if use_mock:
             stream_chunk = Mock()
             stream_chunk.choices = [Mock()]
             stream_chunk.choices[0].delta.content = "OK"
