@@ -7,7 +7,6 @@ student, teacher, admin, ai.
 """
 import os
 import json
-from tool_service import TOOL_DEFINITIONS,execute_tool
 import logging
 from flask import Flask, request, jsonify,send_from_directory, Response,stream_with_context
 from flask_cors import CORS
@@ -17,7 +16,7 @@ import fitz  # PyMuPDF
 import models
 import grading
 import analytics
-from auth import login_required,role_required,generate_token,get_current_user
+from auth import login_required,role_required,generate_token
 from rag_service import ingest, retrieve,collection_stats, chunk_text
 import tool_service # noqa: F401
 # ─── SETUP

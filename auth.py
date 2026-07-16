@@ -6,9 +6,9 @@ JWT payload stored in session cookie — HttpOnly, SameSite=Lax.
 
 import jwt
 import os
+from flask import request, jsonify
 from functools import wraps
 from datetime import datetime, timedelta
-from flask import request, jsonify, session
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-change-in-production")
 TOKEN_EXPIRY_HOURS = 24
 def generate_token(user: dict) -> str:
