@@ -31,14 +31,16 @@ def _is_valid_key(key: str) -> bool:
     if not key:
         return False
     key = key.strip()
-    if key == "***":
+    # Reject masked or invalid keys
+    if "*" in key or key == "***":
         return False
     if key.startswith("***") or key.endswith("***"):
+        return False
+    if key == "REPLACE_ME":
         return False
     if len(key) < 20:
         return False
     return True
-
 
 def _make_mock_client():
     """Build a mock Groq client."""
