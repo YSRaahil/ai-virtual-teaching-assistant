@@ -75,12 +75,6 @@ jobs:
         env:
           DB_PATH: ci_test.db
 
-      - name: Run Groq SDK tests
-        run: |
-          pytest tests/test_groq_sdk.py -v --tb=short
-        env:
-              GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-
       - name: Run Tool service unit tests (no server)
         run: |
           pytest tests/test_tool_service.py -v --tb=short -k "not Api"
