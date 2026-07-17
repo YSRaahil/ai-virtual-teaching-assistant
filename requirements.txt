@@ -2,9 +2,12 @@ flask==3.0.3
 flask-cors==4.0.1
 python-dotenv==1.0.1
 PyJWT==2.8.0
-google-generativeai==0.7.2
 gunicorn==22.0.0
 chromadb==0.5.3
 sentence-transformers==3.0.1
 pymupdf==1.24.5
 groq>=0.1
+# CPU-only torch --avoids puling GPU packages (nvidia-cublas, cuda-toolkit etc.)
+#that blow Render Free tier memory past 512MB
+--extra-index-url  https://download.py-torch.org/whl/cpu
+torch==2.1.0+cpu
