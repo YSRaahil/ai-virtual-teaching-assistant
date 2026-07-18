@@ -1,0 +1,83 @@
+─── BODH AI — .dockerignore ─────────────────────────────────────────────────
+
+Excludes files that should never go into the Docker image.
+
+Keeps image lean and prevents secrets from leaking.
+
+── Secrets — never include ───────────────────────────────────────────────────
+
+.env
+.env.*
+!.env.example
+
+── Python cache ──────────────────────────────────────────────────────────────
+
+pycache/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.pyc
+
+── Virtual environment ───────────────────────────────────────────────────────
+
+venv/
+.venv/
+env/
+ENV/
+
+── Data files — mounted as volumes, not baked in ────────────────────────────
+
+chroma_db/
+*.db
+*.sqlite
+*.sqlite3
+data/
+
+── Test files — not needed in production image ───────────────────────────────
+
+tests/
+test_*.py
+pytest.ini
+.pytest_cache/
+evals/results/
+
+── Git ───────────────────────────────────────────────────────────────────────
+
+.git/
+.gitignore
+
+
+── Dev tools ─────────────────────────────────────────────────────────────────
+
+.vscode/
+.idea/
+*.code-workspace
+
+── OS files ──────────────────────────────────────────────────────────────────
+
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+── Logs ──────────────────────────────────────────────────────────────────────
+
+*.log
+logs/
+
+── Node (if any frontend tooling) ───────────────────────────────────────────
+
+node_modules/
+npm-debug.log
+
+── Coverage reports ──────────────────────────────────────────────────────────
+
+htmlcov/
+.coverage
+coverage.xml
+
+── Misc ──────────────────────────────────────────────────────────────────────
+
+*.md
+!README.md

@@ -1,0 +1,63 @@
+# ─── BODH AI — docker-compose.yml ────────────────────────────────────────────
+# For local development and CI testing only.
+# Production runs on Render — this is NOT used on Render.
+#
+# Usage:
+#   docker compose up          # start
+#   docker compose up --build  # rebuild image first
+#   docker compose down        # stop
+#   docker compose down -v     # stop and delete volumes
+
+version: "3.9"
+
+services:
+  web:
+    # Use the image built by GitHub Actions and pushed to ghcr.io
+    # For local dev, build from source instead:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    image: ghcr.io/ysraahil/ai-virtual-teaching-assistant:latest
+
+    container_name: bodh_ai
+
+    ports:
+      - "5000:5000"
+
+    # ── Environment variables ─────────────────────────────────────────────────
+    # Copy .env.example to .env and fill in real values before running
+    env_file:
+      - .env
+
+    environment:
+      - PYTHONUNBUFFERED=1
+      - FLASK_ENV=development
+      - DB_PATH=/app/data/teaching_assistant.db
+      - CHROMA_DB_PATH=/app/chroma_db
+      - ANONYMIZED_TELEMETRY=False
+      - PORT=5000
+
+    # ── Volumes ───────────────────────────────────────────────────────────────
+    # Persist SQLite and ChromaDB across container restarts
+    volumes:
+      - sqlite_data:/app/data
+      - chroma_data:/app/chroma_db
+
+    # ── Health check ──────────────────────────────────────────────────────────
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s   # give model time to load on first RAG request
+
+    restart: unless-stopped
+
+# ── Named volumes ─────────────────────────────────────────────────────────────
+# Docker manages these — data persists across docker compose down/up
+volumes:
+  sqlite_data:
+    driver: local
+  chroma_data:
+    driver: local
