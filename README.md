@@ -19,15 +19,6 @@
 
 </div>
 
----
-
-<!-- IMAGE 1: Add a screenshot of the student dashboard here -->
-<!-- Suggestion: Open http://localhost:5000/dashboard.html after seeding, take a full-page screenshot -->
-<!-- Place it here like this: -->
-<!-- ![BODH AI Dashboard](docs/dashboard.png) -->
-
----
-
 ## What is BODH AI?
 
 BODH AI started as a 24-hour hackathon project and was rebuilt into a production-grade backend with a full RAG pipeline, agentic AI, and a custom evaluation framework.
